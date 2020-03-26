@@ -5,10 +5,6 @@ const { Command } = require('commander');
 const caesarCipher = require('./utils/caesarCipher');
 const program = new Command();
 
-process.on('exit', code => {
-  console.log(`Exit with status code: ${code}`);
-});
-
 program
   .requiredOption('-s, --shift [value]', 'a shift')
   .option('-i, --input [value]', 'an input file')

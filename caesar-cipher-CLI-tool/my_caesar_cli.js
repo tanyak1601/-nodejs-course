@@ -1,8 +1,6 @@
 #!/usr/bin/env node
-const fs = require('fs');
-const { pipeline } = require('stream');
 const { Command } = require('commander');
-const caesarCipher = require('./utils/caesarCipher');
+const { getPipeline } = require('./src/pipeline');
 const program = new Command();
 
 program
@@ -15,15 +13,4 @@ program.parse(process.argv);
 
 const opts = program.opts();
 
-const readable = opts.input ? fs.createReadStream(opts.input) : process.stdin;
-const writable = opts.output
-  ? fs.createWriteStream(opts.output)
-  : process.stdout;
-
-pipeline(readable, caesarCipher(opts), writable, err => {
-  if (err) {
-    console.error('Pipeline failed.', err.message);
-  } else {
-    console.log('Pipeline succeeded.');
-  }
-});
+getPipeline(opts);

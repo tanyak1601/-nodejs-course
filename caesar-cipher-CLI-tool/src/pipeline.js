@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { pipeline } = require('stream');
-const { transformm } = require('./utils/transform');
+const { transformChunk } = require('./utils/transformChunk');
 
 module.exports.getPipeline = function fn(opts) {
   const options = {
@@ -11,7 +11,7 @@ module.exports.getPipeline = function fn(opts) {
     ? fs.createWriteStream(opts.output, options)
     : process.stdout;
 
-  pipeline(readable, transformm(opts), writable, err => {
+  pipeline(readable, transformChunk(opts), writable, err => {
     if (err) {
       console.error('Pipeline failed.', err.message);
     } else {

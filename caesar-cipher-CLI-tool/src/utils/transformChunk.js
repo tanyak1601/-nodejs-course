@@ -3,7 +3,7 @@ const { StringDecoder } = require('string_decoder');
 const stringDecoder = new StringDecoder('utf-8');
 const { caesarCipher } = require('./caesarCipher');
 
-module.exports.transformm = function fn({ shift, action }) {
+module.exports.transformChunk = function fn({ shift, action }) {
   return new Transform({
     transform(chunk, encoding, callback) {
       if (encoding === 'buffer') {

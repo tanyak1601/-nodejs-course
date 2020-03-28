@@ -4,16 +4,15 @@ const { pipeline } = require('stream');
 const { transformChunk } = require('./utils/transformChunk');
 
 module.exports.getPipeline = function fn(opts) {
-  const inputPath = path.join(__dirname, '..', opts.input);
-  const outputPath = path.join(__dirname, '..', opts.output);
-
   const options = {
     flags: 'a'
   };
 
-  const readable = opts.input ? fs.createReadStream(inputPath) : process.stdin;
+  const readable = opts.input
+    ? fs.createReadStream(path.join(__dirname, '..', opts.input))
+    : process.stdin;
   const writable = opts.output
-    ? fs.createWriteStream(outputPath, options)
+    ? fs.createWriteStream(path.join(__dirname, '..', opts.output), options)
     : process.stdout;
 
   pipeline(readable, transformChunk(opts), writable, err => {

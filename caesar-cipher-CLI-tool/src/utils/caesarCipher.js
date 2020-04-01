@@ -12,7 +12,7 @@ module.exports.caesarCipher = function fn(shift, action, chunk) {
 
         if (action === 'decode') {
           code -= +shift;
-          if (code < 90) code += 26;
+          if (code < 65) code += 26;
         }
       }
 

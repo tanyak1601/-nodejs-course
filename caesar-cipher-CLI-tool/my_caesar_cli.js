@@ -17,7 +17,7 @@ const opts = program.opts();
 try {
   checkOpts(opts);
 } catch (err) {
-  console.error(err.message);
+  process.stdout.write(err.message);
   // eslint-disable-next-line no-process-exit
   process.exit(1);
 }

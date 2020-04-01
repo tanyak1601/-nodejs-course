@@ -3,7 +3,7 @@ module.exports.checkOpts = function fn({ shift, action }) {
     throw Error('Error: shift must be a positive integer');
   }
 
-  if (action !== 'encode' && action !== 'decode ') {
+  if (action !== 'encode' && action !== 'decode') {
     throw Error('Error: action must be encode/decode only');
   }
 };

@@ -16,8 +16,6 @@ const createUser = async data => {
 };
 
 const updateUser = (user, newParams) => {
-  console.log('user ', user);
-
   if (newParams.name && newParams.login && newParams.password) {
     Object.assign(user, newParams);
     return user;

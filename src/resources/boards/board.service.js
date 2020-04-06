@@ -1,4 +1,6 @@
 const boardsRepo = require('./board.memory.repository');
+const taskService = require('../tasks/task.service');
+const { db } = require('../db');
 
 const getAll = () => boardsRepo.getAll();
 
@@ -9,7 +11,14 @@ const createBoard = data => boardsRepo.createBoard(data);
 const updateBoard = (board, newParams) =>
   boardsRepo.updateBoard(board, newParams);
 
-const deleteBoard = board => boardsRepo.deleteBoard(board);
+const deleteBoard = board => {
+  db.tasks.forEach(task => {
+    if (task.boardId === board.id) {
+      taskService.deleteTask(task);
+    }
+  });
+  return boardsRepo.deleteBoard(board);
+};
 
 module.exports = {
   getAll,

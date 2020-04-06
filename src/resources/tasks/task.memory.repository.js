@@ -10,7 +10,7 @@ const findById = async (boardId, taskId) => {
 };
 
 const createTask = async (boardId, data) => {
-  if (data.title && data.description && data.columnId) {
+  if (data.title && data.description) {
     data.boardId = boardId;
     const task = new Task(data);
     db.tasks.push(task);
@@ -25,9 +25,7 @@ const updateTask = (task, newParams) => {
     newParams.id &&
     newParams.title &&
     newParams.description &&
-    newParams.userId &&
-    newParams.boardId &&
-    newParams.columnId
+    newParams.boardId
   ) {
     Object.assign(task, newParams);
     return task;

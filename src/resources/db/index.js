@@ -49,7 +49,7 @@ const task3 = new Task({
   order: 0,
   description: 'implement search panel',
   userId: user3.id,
-  boardId: board1.id,
+  boardId: board2.id,
   columnId: board2.columns[4].id
 });
 

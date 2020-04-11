@@ -1,63 +1,74 @@
 const router = require('express').Router();
 const boardsService = require('./board.service');
 const tasksRouter = require('../tasks/task.router');
+const createError = require('http-errors');
+const catchError = require('../../common/catchError');
 
 router.param('boardId', async (req, res, next, boardId) => {
-  req.board = await boardsService.findById(boardId);
-  next();
+  try {
+    req.board = await boardsService.findById(boardId);
+    return next();
+  } catch (err) {
+    return next(err);
+  }
 });
 
 router
   .route('/')
+  .get(
+    catchError(async (req, res) => {
+      const boards = await boardsService.getAll();
+      res.json(boards);
+    })
+  )
+  .post(
+    catchError(async (req, res) => {
+      const newBoard = await boardsService.createBoard(req.body);
+      if (!newBoard) {
+        throw createError(404, 'Bad request');
+      }
 
-  .get(async (req, res) => {
-    const boards = await boardsService.getAll();
-    res.json(boards);
-  })
-
-  .post(async (req, res) => {
-    const newBoard = await boardsService.createBoard(req.body);
-    if (!newBoard) {
-      res.status(404).json('Bad request');
-    }
-
-    res.json(newBoard);
-  });
+      res.json(newBoard);
+    })
+  );
 
 router
   .route('/:boardId')
+  .get(
+    catchError(async (req, res) => {
+      if (!req.board) {
+        throw createError(404, 'Board not found');
+      }
 
-  .get(async (req, res) => {
-    if (!req.board) {
-      return res.status(404).json('Board not found');
-    }
+      return res.json(req.board);
+    })
+  )
+  .put(
+    catchError(async (req, res) => {
+      if (!req.board) {
+        throw createError(404, 'Bad request');
+      }
 
-    return res.json(req.board);
-  })
+      const updatedBoard = await boardsService.updateBoard(req.board, req.body);
 
-  .put(async (req, res) => {
-    if (!req.board) {
-      return res.status(404).json('Bad request');
-    }
+      if (!updatedBoard) {
+        throw createError(404, 'Bad request');
+      }
 
-    const updatedBoard = await boardsService.updateBoard(req.board, req.body);
+      res.json(updatedBoard);
+    })
+  )
+  .delete(
+    catchError(async (req, res) => {
+      if (!req.board) {
+        throw createError(404, 'Board not found');
+      }
 
-    if (!updatedBoard) {
-      res.status(404).json('Bad request');
-    }
+      await boardsService.deleteBoard(req.board);
 
-    res.json(updatedBoard);
-  })
-
-  .delete(async (req, res) => {
-    if (!req.board) {
-      return res.status(404).json('Board not found');
-    }
-
-    await boardsService.deleteBoard(req.board);
-
-    return res.status(204).end();
-  });
+      return res.status(204).end();
+    })
+  );
 
 router.use('/:boardId/tasks', tasksRouter);
 

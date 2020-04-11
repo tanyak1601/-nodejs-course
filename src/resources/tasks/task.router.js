@@ -1,70 +1,80 @@
 const router = require('express').Router({ mergeParams: true });
 const tasksService = require('./task.service');
+const catchError = require('../../common/catchError');
+const createError = require('http-errors');
 
-router.use('/', (req, res, next) => {
-  if (!req.board) {
-    return res.status(404).json("Bad request (wrong board's id)");
-  }
-  next();
-});
+router.use(
+  '/',
+  catchError((req, res, next) => {
+    if (!req.board) {
+      throw createError(404, "Bad request (wrong board's id)");
+    }
+    next();
+  })
+);
 
 router
   .route('/')
+  .get(
+    catchError(async (req, res) => {
+      const tasks = await tasksService.getAll(req.board.id);
+      res.json(tasks);
+    })
+  )
+  .post(
+    catchError(async (req, res) => {
+      const newTask = await tasksService.createTask(req.board.id, req.body);
 
-  .get(async (req, res) => {
-    const tasks = await tasksService.getAll(req.board.id);
-    res.json(tasks);
-  })
+      if (!newTask) {
+        throw createError(404, 'Bad request');
+      }
 
-  .post(async (req, res) => {
-    const newTask = await tasksService.createTask(req.board.id, req.body);
-
-    if (!newTask) {
-      res.status(404).json('Bad request');
-    }
-
-    res.json(newTask);
-  });
+      res.json(newTask);
+    })
+  );
 
 router
   .route('/:taskId')
+  .get(
+    catchError(async (req, res) => {
+      const task = await tasksService.findById(req.board.id, req.params.taskId);
 
-  .get(async (req, res) => {
-    const task = await tasksService.findById(req.board.id, req.params.taskId);
+      if (!task) {
+        throw createError(404, 'Task not found');
+      }
 
-    if (!task) {
-      return res.status(404).json('Task not found');
-    }
+      return res.json(task);
+    })
+  )
+  .put(
+    catchError(async (req, res) => {
+      const task = await tasksService.findById(req.board.id, req.params.taskId);
 
-    return res.json(task);
-  })
+      if (!task) {
+        throw createError(404, 'Task not found');
+      }
 
-  .put(async (req, res) => {
-    const task = await tasksService.findById(req.board.id, req.params.taskId);
+      const updatedTask = await tasksService.updateTask(task, req.body);
 
-    if (!task) {
-      return res.status(404).json('Task not found');
-    }
+      if (!updatedTask) {
+        throw createError(404, 'Bad request');
+      }
 
-    const updatedTask = await tasksService.updateTask(task, req.body);
+      res.json(updatedTask);
+    })
+  )
+  .delete(
+    catchError(async (req, res) => {
+      const task = await tasksService.findById(req.board.id, req.params.taskId);
 
-    if (!updatedTask) {
-      res.status(400).json('Bad request');
-    }
+      if (!task) {
+        throw createError(404, 'Task not found');
+      }
 
-    res.json(updatedTask);
-  })
+      await tasksService.deleteTask(task);
 
-  .delete(async (req, res) => {
-    const task = await tasksService.findById(req.board.id, req.params.taskId);
-
-    if (!task) {
-      return res.status(404).json('Task not found');
-    }
-
-    await tasksService.deleteTask(task);
-
-    return res.status(204).end();
-  });
+      return res.status(204).end();
+    })
+  );
 
 module.exports = router;

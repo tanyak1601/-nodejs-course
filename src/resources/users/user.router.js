@@ -1,62 +1,74 @@
 const router = require('express').Router();
 const User = require('./user.model');
 const usersService = require('./user.service');
+const createError = require('http-errors');
+const catchError = require('../../common/catchError');
 
 router.param('userId', async (req, res, next, userId) => {
-  req.user = await usersService.findById(userId);
-  next();
+  try {
+    req.user = await usersService.findById(userId);
+    return next();
+  } catch (err) {
+    return next(err);
+  }
 });
 
 router
   .route('/')
+  .get(
+    catchError(async (req, res) => {
+      const users = await usersService.getAll();
+      res.json(users.map(User.toResponse));
+    })
+  )
+  .post(
+    catchError(async (req, res) => {
+      const newUser = await usersService.createUser(req.body);
+      if (!newUser) {
+        throw createError(404, 'Bad request');
+      }
 
-  .get(async (req, res) => {
-    const users = await usersService.getAll();
-    res.json(users.map(User.toResponse));
-  })
-
-  .post(async (req, res) => {
-    const newUser = await usersService.createUser(req.body);
-    if (!newUser) {
-      res.status(404).json('Bad request');
-    }
-
-    res.json(User.toResponse(newUser));
-  });
+      res.json(User.toResponse(newUser));
+    })
+  );
 
 router
   .route('/:userId')
+  .get(
+    catchError(async (req, res) => {
+      if (!req.user) {
+        throw createError(404, 'User not found');
+      }
 
-  .get(async (req, res) => {
-    if (!req.user) {
-      return res.status(404).json('User not found');
-    }
+      return res.json(User.toResponse(req.user));
+    })
+  )
+  .put(
+    catchError(async (req, res) => {
+      if (!req.user) {
+        throw createError(404, 'Bad request');
+      }
 
-    return res.json(User.toResponse(req.user));
-  })
+      const updatedUser = await usersService.updateUser(req.user, req.body);
 
-  .put(async (req, res) => {
-    if (!req.user) {
-      return res.status(404).json('Bad request');
-    }
+      if (!updatedUser) {
+        throw createError(404, 'Bad request');
+      }
 
-    const updatedUser = await usersService.updateUser(req.user, req.body);
+      res.json(User.toResponse(updatedUser));
+    })
+  )
 
-    if (!updatedUser) {
-      res.status(404).json('Bad request');
-    }
+  .delete(
+    catchError(async (req, res) => {
+      if (!req.user) {
+        throw createError(404, 'User not found');
+      }
 
-    res.json(User.toResponse(updatedUser));
-  })
+      await usersService.deleteUser(req.user);
 
-  .delete(async (req, res) => {
-    if (!req.user) {
-      return res.status(404).json('User not found');
-    }
-
-    await usersService.deleteUser(req.user);
-
-    return res.status(204).end();
-  });
+      return res.status(204).end();
+    })
+  );
 
 module.exports = router;

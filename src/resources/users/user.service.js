@@ -1,5 +1,5 @@
-const usersRepo = require('./user.memory.repository');
-const { db } = require('../db');
+const usersRepo = require('./user.db.repository');
+const Task = require('../tasks/task.model');
 
 const getAll = () => usersRepo.getAll();
 
@@ -10,13 +10,7 @@ const createUser = data => usersRepo.createUser(data);
 const updateUser = (user, newParams) => usersRepo.updateUser(user, newParams);
 
 const deleteUser = user => {
-  db.tasks.forEach(task => {
-    if (task.userId === user.id) {
-      task.userId = null;
-    }
-
-    return;
-  });
+  Task.updateMany({ userId: user._id }, { userId: null }).exec();
   return usersRepo.deleteUser(user);
 };
 

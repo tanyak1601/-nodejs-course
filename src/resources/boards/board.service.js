@@ -1,6 +1,5 @@
-const boardsRepo = require('./board.memory.repository');
-const taskService = require('../tasks/task.service');
-const { db } = require('../db');
+const boardsRepo = require('./board.db.repository');
+const Task = require('../tasks/task.model');
 
 const getAll = () => boardsRepo.getAll();
 
@@ -12,11 +11,7 @@ const updateBoard = (board, newParams) =>
   boardsRepo.updateBoard(board, newParams);
 
 const deleteBoard = board => {
-  db.tasks.forEach(task => {
-    if (task.boardId === board.id) {
-      taskService.deleteTask(task);
-    }
-  });
+  Task.deleteMany({ boardId: board._id }).exec();
   return boardsRepo.deleteBoard(board);
 };
 

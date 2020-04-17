@@ -1,4 +1,5 @@
 const router = require('express').Router({ mergeParams: true });
+const Task = require('./task.model');
 const tasksService = require('./task.service');
 const catchError = require('../../common/catchError');
 const createError = require('http-errors');
@@ -18,7 +19,7 @@ router
   .get(
     catchError(async (req, res) => {
       const tasks = await tasksService.getAll(req.board.id);
-      res.json(tasks);
+      res.json(tasks.map(Task.toResponse));
     })
   )
   .post(
@@ -29,7 +30,7 @@ router
         throw createError(404, 'Bad request');
       }
 
-      res.json(newTask);
+      res.json(Task.toResponse(newTask));
     })
   );
 
@@ -43,7 +44,7 @@ router
         throw createError(404, 'Task not found');
       }
 
-      return res.json(task);
+      return res.json(Task.toResponse(task));
     })
   )
   .put(
@@ -60,7 +61,7 @@ router
         throw createError(404, 'Bad request');
       }
 
-      res.json(updatedTask);
+      res.json(Task.toResponse(updatedTask));
     })
   )
   .delete(

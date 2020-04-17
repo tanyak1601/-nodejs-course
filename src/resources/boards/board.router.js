@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const Board = require('./board.model');
 const boardsService = require('./board.service');
 const tasksRouter = require('../tasks/task.router');
 const createError = require('http-errors');
@@ -18,7 +19,7 @@ router
   .get(
     catchError(async (req, res) => {
       const boards = await boardsService.getAll();
-      res.json(boards);
+      res.json(boards.map(Board.toResponse));
     })
   )
   .post(
@@ -28,7 +29,7 @@ router
         throw createError(404, 'Bad request');
       }
 
-      res.json(newBoard);
+      res.json(Board.toResponse(newBoard));
     })
   );
 
@@ -40,7 +41,7 @@ router
         throw createError(404, 'Board not found');
       }
 
-      return res.json(req.board);
+      return res.json(Board.toResponse(req.board));
     })
   )
   .put(
@@ -55,7 +56,7 @@ router
         throw createError(404, 'Bad request');
       }
 
-      res.json(updatedBoard);
+      res.json(Board.toResponse(updatedBoard));
     })
   )
   .delete(

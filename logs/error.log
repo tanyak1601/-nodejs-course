@@ -1,0 +1,7 @@
+{"message":"   level 'error', error code: 404, error message: NotFoundError: Board not found","level":"error","timestamp":"2020-04-17 12:51:49"}
+{"message":"   level 'error', error code: 404, error message: NotFoundError: Bad request (wrong board's id)","level":"error","timestamp":"2020-04-17 12:51:50"}
+{"message":"   level 'error', error code: 404, error message: NotFoundError: Bad request (wrong board's id)","level":"error","timestamp":"2020-04-17 12:51:50"}
+{"message":"   level 'error', error code: 404, error message: NotFoundError: Bad request (wrong board's id)","level":"error","timestamp":"2020-04-17 12:51:50"}
+{"message":"   level 'error', error code: 404, error message: NotFoundError: Bad request (wrong board's id)","level":"error","timestamp":"2020-04-17 12:51:50"}
+{"message":"   level 'error', error code: 404, error message: NotFoundError: Bad request (wrong board's id)","level":"error","timestamp":"2020-04-17 12:51:50"}
+{"message":"   level 'error', error code: 404, error message: NotFoundError: Task not found","level":"error","timestamp":"2020-04-17 12:51:50"}

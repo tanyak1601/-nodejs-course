@@ -6,7 +6,7 @@ const errorHandler = (err, req, res, next) => {
     `level 'error', error code: ${err.status}, error message: ${err}`
   );
 
-  if (err.status === 404) {
+  if (err.status === 404 || err.status === 401 || err.status === 403) {
     res.status(err.status).send(err.message);
   } else {
     res.status(500).send('Something broke!');

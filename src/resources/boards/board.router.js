@@ -4,6 +4,7 @@ const boardsService = require('./board.service');
 const tasksRouter = require('../tasks/task.router');
 const createError = require('http-errors');
 const catchError = require('../../common/catchError');
+const checkToken = require('../../common/checkToken');
 
 router.param('boardId', async (req, res, next, boardId) => {
   try {
@@ -71,6 +72,6 @@ router
     })
   );
 
-router.use('/:boardId/tasks', tasksRouter);
+router.use('/:boardId/tasks', checkToken, tasksRouter);
 
 module.exports = router;
